@@ -1,0 +1,64 @@
+@using Examine.Providers
+@using Examine.SearchCriteria
+@using Umbraco.Web
+@using UmbracoExamine
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+@helper RenderResults(ISearchResults results,UmbracoHelper umbraco)
+{
+    <ul>
+        @foreach (var result in results)
+        {
+            var node = umbraco.TypedContent(result.Id);
+            <li>
+                <a href="@node.Url">@node.Name</a>
+                <br/>Relevance - (@result.Score)<br/>
+                Date created - @node.CreateDate
+            </li>
+        }
+    </ul>
+}
+
+@{
+    BaseSearchProvider _searcher = ExamineManager.Instance.SearchProviderCollection["ExternalSearcher"];
+
+    string fieldToSearch = "bodyText";
+    string HideFromNavigation = "umbracoNaviHide";
+    
+    var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content,BooleanOperation.Or);
+
+    var searchTerm = string.Empty;
+
+    searchTerm = string.IsNullOrEmpty(Request["query"]) ? string.Empty : Request["query"];
+    
+    if (searchTerm == string.Empty)
+    {
+        <p>Enter search term</p>
+    }
+    else
+    {        
+        
+        var examineQuery = criteria.Field(fieldToSearch, searchTerm);
+
+        examineQuery.Not().Field(HideFromNavigation, 1.ToString());
+
+        examineQuery.Or().Field("secondaryContent", searchTerm);
+
+
+        var results = _searcher.Search(examineQuery.Compile());
+        var umbraco = new UmbracoHelper(UmbracoContext.Current);
+        <p>@criteria.ToString()</p>
+        if (results.Any())
+        {
+            <p>You search for ""<strong>@searchTerm</strong>" found @results.Count() results</p>
+   
+            @RenderResults(results, umbraco)
+        }
+        else
+        {
+            <p>No results found for query @searchTerm</p>
+        }
+    }
+}
+
+

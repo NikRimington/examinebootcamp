@@ -167,3 +167,5 @@ Source/Application.Web/node_modules/
 # Sass
 *.sass-cache/
 /Source/Application.Web/App_Data/CmsPlugins/Core
+/ExamineBootcamp.Web/App_Data/NuGetBackup
+/ExamineBootcamp.Web/App_Data/TEMP

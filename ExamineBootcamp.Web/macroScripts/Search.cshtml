@@ -26,7 +26,7 @@
     string fieldToSearch = "contents";
     string HideFromNavigation = "umbracoNaviHide";
     
-    var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content,BooleanOperation.Or);
+    var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content);
 
     var searchTerm = string.Empty;
 

@@ -36,7 +36,7 @@
                 <span class="byline">@Umbraco.Field("byline", recursive: true)</span>
             </div>
         </div>
-	    <form action="/search" method="get">
+        <form action="@(Model.Content.Id.ToString().Contains("1078")?"/recherche":"/Search")" method="get">
 		   <input type="text" placeholder="@Umbraco.GetDictionaryValue("Search")" id="query" name="query"/>
 		   <button>@Umbraco.GetDictionaryValue("Search")</button>
         </form>

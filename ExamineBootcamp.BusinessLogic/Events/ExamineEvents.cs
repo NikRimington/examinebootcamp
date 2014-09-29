@@ -34,6 +34,7 @@ namespace ExamineBootcamp.BusinessLogic.Events
             {             
                 try
                 {
+                    e.Fields.Add("SearchablePath", e.Fields["path"].Replace(",", " ")); //we can then search using languge root node
                     var fields = e.Fields;
                     var combinedFields = new StringBuilder();
                     foreach (var keyValuePair in fields)

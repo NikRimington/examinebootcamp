@@ -1,4 +1,6 @@
-﻿@using Examine.Providers
+﻿@using System.Security.Policy
+@using Examine.Providers
+@using Examine.SearchCriteria
 @using Umbraco.Web
 @using UmbracoExamine
 @inherits umbraco.MacroEngines.DynamicNodeContext
@@ -21,10 +23,10 @@
 @{
     BaseSearchProvider _searcher = ExamineManager.Instance.SearchProviderCollection["ExternalSearcher"];
 
-    string fieldToSearch = "bodyText";
+    string fieldToSearch = "contents";
     string HideFromNavigation = "umbracoNaviHide";
     
-    var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content);
+    var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content,BooleanOperation.Or);
 
     var searchTerm = string.Empty;
 
@@ -36,10 +38,14 @@
     }
     else
     {
+        var umbraco = new UmbracoHelper(UmbracoContext.Current);
+        var siteRootId = Current.Parent.Id;
         var examineQuery = criteria.Field(fieldToSearch, searchTerm);
         examineQuery.Not().Field(HideFromNavigation, 1.ToString());
+        examineQuery.And().Field("SearchablePath", siteRootId.ToString());
+        
         var results = _searcher.Search(examineQuery.Compile());
-        var umbraco = new UmbracoHelper(UmbracoContext.Current);
+
         if (results.Any())
         {
             <p>You search for ""<strong>@searchTerm</strong>" found @results.Count() results</p>

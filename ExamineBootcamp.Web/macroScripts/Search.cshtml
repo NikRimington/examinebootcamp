@@ -1,6 +1,8 @@
 ﻿@using System.Security.Policy
+@using Examine.LuceneEngine.SearchCriteria
 @using Examine.Providers
 @using Examine.SearchCriteria
+@using ExamineBootcamp.BusinessLogic.Helper
 @using Umbraco.Web
 @using UmbracoExamine
 @inherits umbraco.MacroEngines.DynamicNodeContext
@@ -25,13 +27,13 @@
 
     string fieldToSearch = "contents";
     string HideFromNavigation = "umbracoNaviHide";
-    
+
     var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content);
 
     var searchTerm = string.Empty;
 
     searchTerm = string.IsNullOrEmpty(Request["query"]) ? string.Empty : Request["query"];
-    
+    searchTerm = searchTerm.MakeSearchQuerySafe();
     if (searchTerm == string.Empty)
     {
         <p>Enter search term</p>
@@ -40,12 +42,21 @@
     {
         var umbraco = new UmbracoHelper(UmbracoContext.Current);
         var siteRootId = Current.Parent.Id;
-        var examineQuery = criteria.Field(fieldToSearch, searchTerm);
+        var examineQuery = criteria.Field("SearchablePath", siteRootId.ToString());
         examineQuery.Not().Field(HideFromNavigation, 1.ToString());
-        examineQuery.And().Field("SearchablePath", siteRootId.ToString());
-        
-        var results = _searcher.Search(examineQuery.Compile());
 
+        if (searchTerm.Contains(" "))
+        {
+            string[] terms = searchTerm.Split(' ');
+            examineQuery.And().GroupedOr(new List<string> { fieldToSearch }, terms);
+        }
+        else
+        {
+            examineQuery.And().Field(fieldToSearch,searchTerm.MultipleCharacterWildcard());
+        }               
+
+        var results = _searcher.Search(examineQuery.Compile());
+        <p>@criteria.ToString()</p>
         if (results.Any())
         {
             <p>You search for ""<strong>@searchTerm</strong>" found @results.Count() results</p>

@@ -53,7 +53,9 @@
         else
         {
             examineQuery.And().Field(fieldToSearch,searchTerm.MultipleCharacterWildcard());
-        }               
+        }
+
+        examineQuery.And().OrderByDescending("createDate");
 
         var results = _searcher.Search(examineQuery.Compile());
         <p>@criteria.ToString()</p>

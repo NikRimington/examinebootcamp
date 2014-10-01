@@ -191,6 +191,7 @@
   <ItemGroup>
     <Compile Include="Events\ExamineEvents.cs" />
     <Compile Include="Helper\ExamineHelper.cs" />
+    <Compile Include="Indexer\DbIndexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SearchService.cs" />
   </ItemGroup>

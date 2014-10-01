@@ -170,3 +170,4 @@ Source/Application.Web/node_modules/
 /ExamineBootcamp.Web/App_Data/NuGetBackup
 /ExamineBootcamp.Web/App_Data/TEMP
 ExamineBootcamp.Web/App_Data/Logs/UmbracoTraceLog.txt
+ExamineBootcamp.Web/App_Data/MediaIndexSet/

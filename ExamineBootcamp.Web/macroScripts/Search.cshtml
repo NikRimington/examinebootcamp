@@ -16,7 +16,7 @@
             <li>
                 <a href="@node.Url">@node.Name</a>
                 <br/>Relevance - (@result.Score)<br/>
-                Review date - @(node.GetPropertyValue<DateTime>("reviewDate").ToString())
+                Date created - @(node.GetPropertyValue<DateTime>("reviewDate").ToString())
             </li>
         }
     </ul>
@@ -55,7 +55,7 @@
             examineQuery.And().Field(fieldToSearch,searchTerm.MultipleCharacterWildcard());
         }
 
-        examineQuery.And().OrderByDescending("createDate");
+        examineQuery.And().OrderByDescending("reviewDate");
 
         var results = _searcher.Search(examineQuery.Compile());
         <p>@criteria.ToString()</p>

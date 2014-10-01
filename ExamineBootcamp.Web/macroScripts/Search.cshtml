@@ -16,7 +16,7 @@
             <li>
                 <a href="@node.Url">@node.Name</a>
                 <br/>Relevance - (@result.Score)<br/>
-                Date created - @node.CreateDate
+                Review date - @(node.GetPropertyValue<DateTime>("reviewDate").ToString())
             </li>
         }
     </ul>

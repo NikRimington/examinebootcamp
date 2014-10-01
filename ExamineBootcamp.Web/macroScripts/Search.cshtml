@@ -1,8 +1,10 @@
 ﻿@using System.Security.Policy
+@using Examine.LuceneEngine.Providers
 @using Examine.LuceneEngine.SearchCriteria
 @using Examine.Providers
 @using Examine.SearchCriteria
 @using ExamineBootcamp.BusinessLogic.Helper
+@using java.awt
 @using Umbraco.Web
 @using UmbracoExamine
 @inherits umbraco.MacroEngines.DynamicNodeContext
@@ -12,30 +14,45 @@
     <ul>
         @foreach (var result in results)
         {
-            var node = umbraco.TypedContent(result.Id);
-            <li>
-                <a href="@node.Url">@node.Name</a>
-                <br/>Relevance - (@result.Score)<br/>
-                                @{
-                    var reviewDate = node.GetPropertyValue<DateTime>("reviewDate");
-                    if (reviewDate == DateTime.MinValue)
-                    {
-                        reviewDate = node.UpdateDate;
+            if (result.Fields["nodeTypeAlias"].ToLower() == "file")
+            {
+                var media = umbraco.TypedMedia(result.Id);
+                <li>
+                    <a href="@media.Url">@media.Name</a>
+                    <br />Relevance - (@result.Score)<br />
+                    created - @(media.CreateDate.ToString())
+                </li>
+            }
+            else
+            {
+
+                var node = umbraco.TypedContent(result.Id);
+                <li>
+                    <a href="@node.Url">@node.Name</a>
+                    <br />Relevance - (@result.Score)<br />
+                    @{
+                var reviewDate = node.GetPropertyValue<DateTime>("reviewDate");
+                if (reviewDate == DateTime.MinValue)
+                {
+                    reviewDate = node.UpdateDate;
+                }
                     }
-                                }
-                Review created - @(reviewDate.ToString())
-            </li>
+                    Review created - @(reviewDate.ToString())
+                </li>
+
+            }
         }
     </ul>
 }
 
 @{
-    BaseSearchProvider _searcher = ExamineManager.Instance.SearchProviderCollection["ExternalSearcher"];
+
+    MultiIndexSearcher _searcher = ExamineHelper.GetMultiSearcher(new[] {"ExternalIndexer", "MediaIndexer"});
 
     string fieldToSearch = "contents";
     string HideFromNavigation = "umbracoNaviHide";
 
-    var criteria = _searcher.CreateSearchCriteria(IndexTypes.Content);
+    var criteria = _searcher.CreateSearchCriteria(BooleanOperation.And);
 
     var searchTerm = string.Empty;
 
@@ -59,7 +76,8 @@
         }
         else
         {
-            examineQuery.And().Field(fieldToSearch,searchTerm.MultipleCharacterWildcard());
+
+            examineQuery.And().GroupedOr(new List<string> { fieldToSearch ,"FileTextContent"}, searchTerm.MultipleCharacterWildcard());
         }
 
         examineQuery.And().OrderByDescending("reviewDate");

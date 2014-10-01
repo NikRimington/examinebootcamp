@@ -29,9 +29,17 @@ namespace ExamineBootcamp.BusinessLogic.Events
              ExamineManager.Instance.IndexProviderCollection["ExternalIndexer"].GatheringNodeData +=
                 ExternalIndexerGatheringNodeData;
 
+             ExamineManager.Instance.IndexProviderCollection["MediaIndexer"].GatheringNodeData += MediaIndexer_GatheringNodeData;
              var indexer = (UmbracoContentIndexer)ExamineManager.Instance.IndexProviderCollection["ExternalIndexer"];
 
              indexer.DocumentWriting += indexer_DocumentWriting;
+        }
+
+        void MediaIndexer_GatheringNodeData(object sender, IndexingNodeDataEventArgs e)
+        {
+            const string ukparentId = "1068";
+
+            e.Fields.Add("SearchablePath", ukparentId); 
         }
 
         void indexer_DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
